@@ -1,8 +1,8 @@
 #!/bin/bash
-echo "Creating indexes..."
-sleep 45
+echo "=== 06: Creating indexes ==="
 
-mongosh --host mongos1 --port 27017 -u admin -p adminpass123 --authenticationDatabase admin <<EOF
+mongosh --host mongos1 --port 27017 \
+  -u admin -p adminpass123 --authenticationDatabase admin <<'EOF'
 
 use filmdb
 
@@ -25,3 +25,11 @@ db.ratings.createIndex({ "rating": -1 })
 
 print("Indexes created!")
 EOF
+
+echo "=== 06: Done - indexes created ==="
+echo ""
+echo "======================================"
+echo "  Cluster initialization complete!"
+echo "  Mongos:   mongodb://admin:adminpass123@localhost:27117"
+echo "  Compass:  http://localhost:3000"
+echo "======================================"

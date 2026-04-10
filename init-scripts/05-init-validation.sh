@@ -1,102 +1,108 @@
 #!/bin/bash
-echo "Creating validation schemas..."
-sleep 40
+echo "=== 05: Creating validation schemas ==="
 
-mongosh --host mongos1 --port 27017 -u admin -p adminpass123 --authenticationDatabase admin <<EOF
+mongosh --host mongos1 --port 27017 \
+  -u admin -p adminpass123 --authenticationDatabase admin <<'EOF'
 
 use filmdb
 
-// Validační schéma pro movies
-db.createCollection("movies", {
+// Kolekce uz existuji (vytvoreny shardingem), pouzijeme collMod pro aplikaci validatoru
+db.runCommand({
+  collMod: "movies",
   validator: {
-    \$jsonSchema: {
+    $jsonSchema: {
       bsonType: "object",
       required: ["id", "title", "release_date"],
       properties: {
         id: {
           bsonType: "int",
-          description: "ID filmu - povinné"
+          description: "ID filmu - povinne"
         },
         title: {
           bsonType: "string",
-          description: "Název filmu - povinný"
+          description: "Nazev filmu - povinny"
         },
         release_date: {
           bsonType: "string",
-          description: "Datum vydání - povinné"
+          description: "Datum vydani - povinne"
         },
         budget: {
           bsonType: "int",
-          description: "Rozpočet filmu"
+          description: "Rozpocet filmu"
         },
         revenue: {
           bsonType: "int",
-          description: "Tržby filmu"
+          description: "Trzby filmu"
         },
         vote_average: {
           bsonType: "double",
           minimum: 0,
           maximum: 10,
-          description: "Hodnocení musí být 0-10"
+          description: "Hodnoceni musi byt 0-10"
         }
       }
     }
-  }
+  },
+  validationLevel: "moderate"
 })
 
-// Validační schéma pro credits
-db.createCollection("credits", {
+db.runCommand({
+  collMod: "credits",
   validator: {
-    \$jsonSchema: {
+    $jsonSchema: {
       bsonType: "object",
       required: ["movie_id", "title"],
       properties: {
         movie_id: {
           bsonType: "int",
-          description: "ID filmu - povinné"
+          description: "ID filmu - povinne"
         },
         title: {
           bsonType: "string",
-          description: "Název filmu - povinný"
+          description: "Nazev filmu - povinny"
         },
         cast: {
           bsonType: "array",
-          description: "Seznam herců"
+          description: "Seznam hercu"
         },
         crew: {
           bsonType: "array",
-          description: "Seznam štábu"
+          description: "Seznam stabu"
         }
       }
     }
-  }
+  },
+  validationLevel: "moderate"
 })
 
-// Validační schéma pro ratings
-db.createCollection("ratings", {
+db.runCommand({
+  collMod: "ratings",
   validator: {
-    \$jsonSchema: {
+    $jsonSchema: {
       bsonType: "object",
       required: ["userId", "movieId", "rating"],
       properties: {
         userId: {
           bsonType: "int",
-          description: "ID uživatele - povinné"
+          description: "ID uzivatele - povinne"
         },
         movieId: {
           bsonType: "int",
-          description: "ID filmu - povinné"
+          description: "ID filmu - povinne"
         },
         rating: {
           bsonType: "double",
           minimum: 0.5,
           maximum: 5.0,
-          description: "Hodnocení musí být 0.5-5.0"
+          description: "Hodnoceni musi byt 0.5-5.0"
         }
       }
     }
-  }
+  },
+  validationLevel: "moderate"
 })
 
 print("Validation schemas created!")
 EOF
+
+echo "=== 05: Done - validation schemas created ==="

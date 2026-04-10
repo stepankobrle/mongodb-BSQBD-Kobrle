@@ -1,0 +1,25 @@
+# Keyfile (generován automaticky)
+keyfile
+
+# Interní dokumentace a paměť Claude
+CLAUDE.md
+.claude/
+
+# Data soubory (velké CSV)
+data/*.csv
+data/.ipynb_checkpoints/
+
+# Jupyter checkpoints
+**/.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Kaggle token
+.kaggle/
+
+# IDE
+.vscode/
+*.code-workspace
