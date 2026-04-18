@@ -1,21 +1,36 @@
 version: '3.8'
 
-# Two-phase initialization:
-# Phase 1: All nodes start WITHOUT keyfile (no auth) so replica sets can be initialized
-#           and users created via init scripts.
-# Phase 2: After /init-data/phase2 flag is written, all nodes restart WITH --keyFile.
-# The shared 'init_data' volume carries flag files between containers.
+# Dynamicke generovani keyfile + two-phase inicializace:
+# Phase 0: keyfile-generator vygeneruje keyfile pres openssl do sdileneho volume init_data.
+# Phase 1: Vsechny nody startuji BEZ keyfile (no auth) - lze initnout replica sety a vytvorit uzivatele.
+# Phase 2: Po zapisu /init-data/phase2 se vsechny nody restartuji S --keyFile.
 
 services:
+  # ── Keyfile Generator ──────────────────────────────────────────────────────
+  # Vygeneruje dynamicky keyfile pres openssl rand -base64 756.
+  # Keyfile je ulozen ve sdilenem volume init_data a mongo nody si ho kopiruji
+  # do sveho kontejneru (kvuli moznosti chmod/chown).
+  keyfile-generator:
+    image: alpine:3.19
+    container_name: keyfile-generator
+    volumes:
+      - ./init-scripts:/init-scripts
+      - init_data:/init-data
+    command: sh /init-scripts/00-generate-keyfile.sh
+    networks:
+      - mongo-net
+
   # ── Config Servers ──────────────────────────────────────────────────────────
   configsvr1:
     image: mongo:8.0
     container_name: configsvr1
     command: bash /init-scripts/startup-configsvr.sh
+    depends_on:
+      keyfile-generator:
+        condition: service_completed_successfully
     volumes:
       - configsvr1_data:/data/db
       - ./init-scripts:/init-scripts
-      - ./keyfile:/etc/mongo/keyfile
       - init_data:/init-data
     networks:
       - mongo-net
@@ -24,10 +39,12 @@ services:
     image: mongo:8.0
     container_name: configsvr2
     command: bash /init-scripts/startup-configsvr.sh
+    depends_on:
+      keyfile-generator:
+        condition: service_completed_successfully
     volumes:
       - configsvr2_data:/data/db
       - ./init-scripts:/init-scripts
-      - ./keyfile:/etc/mongo/keyfile
       - init_data:/init-data
     networks:
       - mongo-net
@@ -36,10 +53,12 @@ services:
     image: mongo:8.0
     container_name: configsvr3
     command: bash /init-scripts/startup-configsvr.sh
+    depends_on:
+      keyfile-generator:
+        condition: service_completed_successfully
     volumes:
       - configsvr3_data:/data/db
       - ./init-scripts:/init-scripts
-      - ./keyfile:/etc/mongo/keyfile
       - init_data:/init-data
     networks:
       - mongo-net
@@ -49,12 +68,14 @@ services:
     image: mongo:8.0
     container_name: shard1svr1
     command: bash /init-scripts/startup-shardsvr.sh
+    depends_on:
+      keyfile-generator:
+        condition: service_completed_successfully
     environment:
       MONGO_REPLSET: shard1ReplSet
     volumes:
       - shard1svr1_data:/data/db
       - ./init-scripts:/init-scripts
-      - ./keyfile:/etc/mongo/keyfile
       - init_data:/init-data
     networks:
       - mongo-net
@@ -63,12 +84,14 @@ services:
     image: mongo:8.0
     container_name: shard1svr2
     command: bash /init-scripts/startup-shardsvr.sh
+    depends_on:
+      keyfile-generator:
+        condition: service_completed_successfully
     environment:
       MONGO_REPLSET: shard1ReplSet
     volumes:
       - shard1svr2_data:/data/db
       - ./init-scripts:/init-scripts
-      - ./keyfile:/etc/mongo/keyfile
       - init_data:/init-data
     networks:
       - mongo-net
@@ -77,12 +100,14 @@ services:
     image: mongo:8.0
     container_name: shard1svr3
     command: bash /init-scripts/startup-shardsvr.sh
+    depends_on:
+      keyfile-generator:
+        condition: service_completed_successfully
     environment:
       MONGO_REPLSET: shard1ReplSet
     volumes:
       - shard1svr3_data:/data/db
       - ./init-scripts:/init-scripts
-      - ./keyfile:/etc/mongo/keyfile
       - init_data:/init-data
     networks:
       - mongo-net
@@ -92,12 +117,14 @@ services:
     image: mongo:8.0
     container_name: shard2svr1
     command: bash /init-scripts/startup-shardsvr.sh
+    depends_on:
+      keyfile-generator:
+        condition: service_completed_successfully
     environment:
       MONGO_REPLSET: shard2ReplSet
     volumes:
       - shard2svr1_data:/data/db
       - ./init-scripts:/init-scripts
-      - ./keyfile:/etc/mongo/keyfile
       - init_data:/init-data
     networks:
       - mongo-net
@@ -106,12 +133,14 @@ services:
     image: mongo:8.0
     container_name: shard2svr2
     command: bash /init-scripts/startup-shardsvr.sh
+    depends_on:
+      keyfile-generator:
+        condition: service_completed_successfully
     environment:
       MONGO_REPLSET: shard2ReplSet
     volumes:
       - shard2svr2_data:/data/db
       - ./init-scripts:/init-scripts
-      - ./keyfile:/etc/mongo/keyfile
       - init_data:/init-data
     networks:
       - mongo-net
@@ -120,12 +149,14 @@ services:
     image: mongo:8.0
     container_name: shard2svr3
     command: bash /init-scripts/startup-shardsvr.sh
+    depends_on:
+      keyfile-generator:
+        condition: service_completed_successfully
     environment:
       MONGO_REPLSET: shard2ReplSet
     volumes:
       - shard2svr3_data:/data/db
       - ./init-scripts:/init-scripts
-      - ./keyfile:/etc/mongo/keyfile
       - init_data:/init-data
     networks:
       - mongo-net
@@ -135,12 +166,14 @@ services:
     image: mongo:8.0
     container_name: shard3svr1
     command: bash /init-scripts/startup-shardsvr.sh
+    depends_on:
+      keyfile-generator:
+        condition: service_completed_successfully
     environment:
       MONGO_REPLSET: shard3ReplSet
     volumes:
       - shard3svr1_data:/data/db
       - ./init-scripts:/init-scripts
-      - ./keyfile:/etc/mongo/keyfile
       - init_data:/init-data
     networks:
       - mongo-net
@@ -149,12 +182,14 @@ services:
     image: mongo:8.0
     container_name: shard3svr2
     command: bash /init-scripts/startup-shardsvr.sh
+    depends_on:
+      keyfile-generator:
+        condition: service_completed_successfully
     environment:
       MONGO_REPLSET: shard3ReplSet
     volumes:
       - shard3svr2_data:/data/db
       - ./init-scripts:/init-scripts
-      - ./keyfile:/etc/mongo/keyfile
       - init_data:/init-data
     networks:
       - mongo-net
@@ -163,12 +198,14 @@ services:
     image: mongo:8.0
     container_name: shard3svr3
     command: bash /init-scripts/startup-shardsvr.sh
+    depends_on:
+      keyfile-generator:
+        condition: service_completed_successfully
     environment:
       MONGO_REPLSET: shard3ReplSet
     volumes:
       - shard3svr3_data:/data/db
       - ./init-scripts:/init-scripts
-      - ./keyfile:/etc/mongo/keyfile
       - init_data:/init-data
     networks:
       - mongo-net
@@ -183,12 +220,16 @@ services:
       - "27117:27017"
     volumes:
       - ./init-scripts:/init-scripts
-      - ./keyfile:/etc/mongo/keyfile
       - init_data:/init-data
     depends_on:
-      - configsvr1
-      - configsvr2
-      - configsvr3
+      keyfile-generator:
+        condition: service_completed_successfully
+      configsvr1:
+        condition: service_started
+      configsvr2:
+        condition: service_started
+      configsvr3:
+        condition: service_started
     networks:
       - mongo-net
 
@@ -200,12 +241,16 @@ services:
       - "27118:27017"
     volumes:
       - ./init-scripts:/init-scripts
-      - ./keyfile:/etc/mongo/keyfile
       - init_data:/init-data
     depends_on:
-      - configsvr1
-      - configsvr2
-      - configsvr3
+      keyfile-generator:
+        condition: service_completed_successfully
+      configsvr1:
+        condition: service_started
+      configsvr2:
+        condition: service_started
+      configsvr3:
+        condition: service_started
     networks:
       - mongo-net
 
@@ -240,6 +285,22 @@ services:
         bash /init-scripts/05-init-validation.sh &&
         bash /init-scripts/06-init-indexes.sh
       "
+    networks:
+      - mongo-net
+
+  # ── Data Import ─────────────────────────────────────────────────────────────
+  data-import:
+    image: python:3.11-slim
+    container_name: data-import
+    volumes:
+      - ./data:/data
+    depends_on:
+      mongo-init:
+        condition: service_completed_successfully
+    environment:
+      MONGO_URI: mongodb://filmuser:filmpass123@mongos1:27017/filmdb?authSource=admin
+    command: >
+      bash -c "pip install pymongo pandas --quiet && python /data/import_data.py"
     networks:
       - mongo-net
 

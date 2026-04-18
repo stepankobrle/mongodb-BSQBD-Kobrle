@@ -3,6 +3,19 @@ set -e
 
 echo "=== Config Server Startup ==="
 
+echo "Cekam na vygenerovany keyfile (/init-data/keyfile)..."
+until [ -f /init-data/keyfile ]; do
+  sleep 1
+done
+echo "Keyfile nalezen."
+
+# Kopirujeme keyfile ze sdileneho volume do lokalniho umisteni,
+# protoze na bind-mountovane volume nelze spolehlive menit vlastnika (mongodb:mongodb).
+mkdir -p /etc/mongo
+cp /init-data/keyfile /etc/mongo/keyfile
+chmod 400 /etc/mongo/keyfile
+chown mongodb:mongodb /etc/mongo/keyfile
+
 echo "Phase 1: Starting mongod WITHOUT keyfile..."
 mongod --configsvr --replSet configReplSet --port 27017 --bind_ip_all &
 MONGOD_PID=$!
@@ -22,6 +35,4 @@ wait $MONGOD_PID 2>/dev/null || true
 sleep 3
 
 echo "Phase 2: Starting mongod WITH keyfile..."
-chmod 400 /etc/mongo/keyfile
-chown mongodb:mongodb /etc/mongo/keyfile
 exec mongod --configsvr --replSet configReplSet --port 27017 --keyFile /etc/mongo/keyfile --bind_ip_all
