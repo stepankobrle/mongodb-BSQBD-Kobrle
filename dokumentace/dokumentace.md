@@ -62,16 +62,16 @@ Tato semestrální práce se zabývá návrhem, nasazením a použitím **NoSQL 
 
 **Použitá verze MongoDB: 8.0** (aktuální hlavní větev v době zpracování; splňuje podmínku max. 3 verze zpět od aktuální).
 
-**Použité Docker obrazy:**
+**Použité Docker obrazy z Docker Hub:**
 
 | Obraz | Zdroj | Zdůvodnění volby |
 |-------|-------|------------------|
-| `mongo:8.0` | Docker Hub (oficiální) | Stabilní oficiální obraz udržovaný společností MongoDB Inc., obsahuje `mongod`, `mongos` i `mongosh`, podporuje config server, shard server i router režim přes startup flagy. |
-| `haohanyang/compass-web:latest` | Docker Hub (community) | Webová verze nástroje MongoDB Compass – umožňuje průzkum databáze v prohlížeči bez nutnosti lokální instalace Compass desktop aplikace. Požadavek zadání na přítomnost Compass (viz téma č. 2). |
-| `alpine:3.19` | Docker Hub (oficiální) | Minimalistický obraz (~8 MB) využitý v kontejneru `keyfile-generator` pro dynamické vygenerování keyfile přes `openssl rand -base64 756`. |
-| `python:3.11-slim` | Docker Hub (oficiální) | Runtime pro `data-import` kontejner; slim varianta bez zbytečných systémových knihoven. Doinstalovává `pymongo` a `pandas` za běhu. |
+| `mongo:8.0` | [Docker Hub (official)](https://hub.docker.com/_/mongo) | **Oficiální obraz** udržovaný přímo společností MongoDB Inc. Zvolen pro maximální kompatibilitu se všemi funkcemi verze 8.0 (sharding, replikace, auth). Preferován před obrazy Bitnami pro "vanilla" chování bez dodatečných konfiguračních vrstev, což je v akademickém projektu žádoucí pro demonstraci nativních startup skriptů. |
+| `haohanyang/compass-web:latest` | [Docker Hub](https://hub.docker.com/r/haohanyang/compass-web) | **Webová verze MongoDB Compass**. Splňuje podmínku zadání na přítomnost UI nástroje (Mongo-express nebo MongoCompass). Zvolen pro modernější rozhraní a identickou UX s desktopovou verzí Compass, kterou studenti využívají v hodinách. |
+| `alpine:3.19` | [Docker Hub (official)](https://hub.docker.com/_/alpine) | Oficiální minimalistický obraz (~8 MB) pro `keyfile-generator`. Obsahuje `openssl` a je ideální pro jednorázové pomocné úlohy s minimální režií. |
+| `python:3.11-slim` | [Docker Hub (official)](https://hub.docker.com/_/python) | Oficiální Python obraz pro `data-import`. Varianta `slim` je zvolena pro menší velikost při zachování stability. |
 
-Projekt není postaven na vlastním Dockerfile – všechny služby používají upstream obrazy beze změny, pouze s parametrizovaným startup skriptem. To zjednodušuje údržbu a reprodukovatelnost.
+Všechny služby využívají **oficiální obrazy** (případně komunitní standardy pro Compass Web) přímo z Docker Hubu. Projekt není postaven na vlastních Dockerfile (vše je parametrizováno startup skripty), což zajišťuje čistotu řešení a snadnou aktualizaci obrazů.
 
 ---
 
@@ -158,7 +158,7 @@ Náš projekt tyto požadavky nemá, jeden cluster je správná volba.
 
 ### 1.2.3 Uzly
 
-**Celkový počet MongoDB nodů: 11** (minimum požadované zadáním jsou 3).
+**Celkem 12 MongoDB nodů** (+ 2 mongos routery + 1 Compass).
 
 Rozdělení rolí:
 

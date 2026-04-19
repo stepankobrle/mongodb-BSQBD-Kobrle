@@ -60,8 +60,15 @@ Nebo lokálně (vyžaduje Python 3 + pymongo + pandas):
 
 ```bash
 pip install pymongo pandas
-python data/import_data.py
 ```
+
+### Docker obrazy
+
+Projekt využívá **oficiální obrazy z Docker Hub** (viz [dokumentace](dokumentace/dokumentace.md)):
+- `mongo:8.0` (Official MongoDB image) – zvoleno pro nativní podporu všech funkcí v8.0.
+- `haohanyang/compass-web:latest` (MongoCompass Web UI) – splňuje požadavek na webové UI (Compass).
+- `alpine:3.19` (Keyfile generator) – minimalistický obraz pro generování klíčů.
+- `python:3.11-slim` (Data import) – runtime pro importní skript.
 
 ### Přihlašovací údaje
 
