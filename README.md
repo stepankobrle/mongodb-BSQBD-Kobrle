@@ -8,7 +8,7 @@
 
 - [dokumentace/dokumentace.md](dokumentace/dokumentace.md) – kompletní dokumentace projektu (7 kapitol)
 - [dokumentace/obrazky/schema_architektury.svg](dokumentace/obrazky/schema_architektury.svg) – schéma architektury
-- [dotazy/dotazy.md](dotazy/dotazy.md) – 30 dotazů v 5 kategoriích s komentáři
+- [Dotazy/dotazy.md](Dotazy/dotazy.md) – 30 dotazů v 5 kategoriích s komentáři
 - [CLAUDE.md](CLAUDE.md) – interní checklist splnění zadání
 
 ---
@@ -23,15 +23,19 @@
 
 ### Volitelná konfigurace (.env)
 
-Projekt funguje bez úprav. Pro změnu hesel/portů zkopírujte [.env.example](.env.example) jako `.env` a upravte hodnoty:
+Projekt funguje bez úprav. Pro změnu hesel/portů zkopírujte [Funkční řešení/.env.example](Funkční%20řešení/.env.example) jako `.env` a upravte hodnoty:
 
 ```bash
+cd "Funkční řešení"
 cp .env.example .env
 ```
 
 ### Spuštění clusteru
 
+Spusťte z kořene repa (relativní cesty v compose jsou anchorované na složku `Funkční řešení`):
+
 ```bash
+cd "Funkční řešení"
 docker compose up -d
 ```
 
@@ -127,7 +131,7 @@ docker compose down -v
 
 ## Přehled dotazů
 
-Všechny dotazy jsou k dispozici v [dotazy/dotazy.md](dotazy/dotazy.md).
+Všechny dotazy jsou k dispozici v [Dotazy/dotazy.md](Dotazy/dotazy.md).
 
 Připojení před spuštěním dotazů:
 
@@ -198,24 +202,26 @@ use filmdb
 
 ```
 mongodb-BSQBD-Kobrle/
-├── docker-compose.yml          # Orchestrace celého clusteru
 ├── CLAUDE.md                   # Interní dokumentace projektu
-├── .env.example                # Vzorové env proměnné
-├── init-scripts/
-│   ├── 00-generate-keyfile.sh  # Generuje keyfile (openssl rand -base64 756)
-│   ├── 01-init-configsvr.sh    # Inicializuje config replica set
-│   ├── 02-init-shards.sh       # Inicializuje shard1, shard2, shard3
-│   ├── 03-init-mongos.sh       # Přidává shardy, zapíná sharding na kolekcích
-│   ├── 04-init-users.sh        # Vytváří admin a aplikační uživatele
-│   ├── 05-init-validation.sh   # Validační schémata ($jsonSchema)
-│   └── 06-init-indexes.sh      # Sekundární indexy
-├── data/
+├── README.md                   # Tento soubor
+├── Funkční řešení/             # Příloha zadání: funkční řešení
+│   ├── docker-compose.yml      # Orchestrace celého clusteru
+│   ├── .env.example            # Vzorové env proměnné
+│   └── init-scripts/
+│       ├── 00-generate-keyfile.sh  # Generuje keyfile (openssl rand -base64 756)
+│       ├── 01-init-configsvr.sh    # Inicializuje config replica set
+│       ├── 02-init-shards.sh       # Inicializuje shard1, shard2, shard3
+│       ├── 03-init-mongos.sh       # Přidává shardy, zapíná sharding na kolekcích
+│       ├── 04-init-users.sh        # Vytváří admin a aplikační uživatele
+│       ├── 05-init-validation.sh   # Validační schémata ($jsonSchema)
+│       └── 06-init-indexes.sh      # Sekundární indexy
+├── Data/                       # Příloha zadání: datasety + Python/Jupyter
 │   ├── tmdb_5000_movies.csv    # Dataset TMDB Movies (Kaggle)
 │   ├── tmdb_5000_credits.csv   # Dataset TMDB Credits (Kaggle)
 │   ├── ratings_small.csv       # Dataset MovieLens Ratings (Kaggle)
 │   ├── import_data.py          # Import dat do MongoDB
 │   └── eda_import.ipynb        # EDA analýza v JupyterLab
-├── dotazy/
+├── Dotazy/                     # Příloha zadání: dotazy
 │   └── dotazy.md               # 30 dotazů s příkazy a komentáři
 └── dokumentace/
     ├── dokumentace.md          # Kompletní dokumentace (7 kapitol)

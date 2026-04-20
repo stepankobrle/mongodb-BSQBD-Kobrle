@@ -28,7 +28,7 @@ rs.initiate({
 EOF
 
 echo "Waiting for configReplSet primary to be elected..."
-until [ "$(mongosh --host configsvr1 --port 27017 --eval "rs.isMaster().ismaster" --quiet 2>/dev/null)" = "true" ]; do
+until mongosh --host configsvr1 --port 27017 --eval "rs.status().members.some(m => m.state === 1)" --quiet 2>/dev/null | grep -q "true"; do
   sleep 2
 done
 echo "configReplSet primary is ready"

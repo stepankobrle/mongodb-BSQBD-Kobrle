@@ -13,7 +13,7 @@ wait_for_mongo() {
 wait_for_primary() {
   local host=$1
   echo "  Waiting for primary at $host..."
-  until [ "$(mongosh --host "$host" --port 27017 --eval "rs.isMaster().ismaster" --quiet 2>/dev/null)" = "true" ]; do
+  until mongosh --host "$host" --port 27017 --eval "rs.status().members.some(m => m.state === 1)" --quiet 2>/dev/null | grep -q "true"; do
     sleep 2
   done
   echo "  Primary elected at $host"

@@ -27,11 +27,11 @@ db.runCommand({
           description: "Datum vydani - povinne"
         },
         budget: {
-          bsonType: "int",
+          bsonType: ["int", "long"],
           description: "Rozpocet filmu"
         },
         revenue: {
-          bsonType: "int",
+          bsonType: ["int", "long"],
           description: "Trzby filmu"
         },
         vote_average: {

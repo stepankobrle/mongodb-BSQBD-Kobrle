@@ -293,7 +293,7 @@ services:
     image: python:3.11-slim
     container_name: data-import
     volumes:
-      - ./data:/data
+      - ../Data:/data
     depends_on:
       mongo-init:
         condition: service_completed_successfully
@@ -310,7 +310,7 @@ services:
     container_name: compass-web
     command: compass-web --host 0.0.0.0 --mongo-uri mongodb://admin:adminpass123@mongos1:27017/admin
     ports:
-      - "3000:8080"
+      - "3002:8080"
     depends_on:
       - mongos1
     networks:
