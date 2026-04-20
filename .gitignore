@@ -6,7 +6,6 @@ CLAUDE.md
 .claude/
 
 # Data soubory (velké CSV)
-Data/*.csv
 Data/.ipynb_checkpoints/
 
 # Jupyter checkpoints
